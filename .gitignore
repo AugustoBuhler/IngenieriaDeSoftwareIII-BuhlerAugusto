@@ -1,0 +1,30 @@
+# ---- Secretos: NUNCA se versionan ----
+.env
+.env.local
+*.local
+
+# ---- Dependencias ----
+node_modules/
+
+# ---- Artefactos de build ----
+dist/
+build/
+coverage/
+
+# ---- Logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- Sistema operativo ----
+.DS_Store
+Thumbs.db
+
+# ---- Editores ----
+.vscode/
+.idea/
+*.swp
+
+# ---- Material de cursada (no forma parte de la entrega) ----
+docs-entrega1/
