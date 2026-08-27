@@ -338,6 +338,27 @@ tiene beneficio verificable.
   no cambia nada: hay que romper una **dependencia** (un paquete inexistente en
   `package.json` → falla el `npm ci` del Dockerfile).
 
+## Bitácora en `TpsDocs/` — obligatoria
+
+Además de los entregables, se mantiene **un documento por TP** en `TpsDocs/`
+(`TP1.md`, `TP2.md`, `TP3.md`, `TP4.md`), actualizado **a medida que se avanza**, no
+al final. Cada uno lleva:
+
+- El checklist del enunciado con su estado
+- El paso a paso ejecutado, con los **comandos reales y su salida real**
+- Las capturas que correspondan
+- Los problemas que aparecieron y cómo se resolvieron
+- Las preguntas de defensa de ese TP **con su respuesta desarrollada**
+
+Esto es material de trabajo y de estudio: **no reemplaza** a `decisiones.md` ni a
+`evidencias.md`, que son lo que la cátedra corrige y viven en la **raíz**.
+
+**Capturas**: las imágenes van en `img/` en la **raíz** del repositorio, para que
+`evidencias.md` (`img/x.png`) y los documentos de `TpsDocs/` (`../img/x.png`) apunten
+al mismo archivo. Las capturas de pantalla del navegador y de la terminal las saca
+Augusto: el asistente no puede. Cuando un documento necesite una, se deja el destino
+anotado y marcado como pendiente.
+
 ## Convenciones de trabajo
 
 - Rama por cambio, `feature/` o `fix/`, squash merge, borrar la rama después.
