@@ -283,7 +283,162 @@ y verifiqué que funcionaba haciendo el push de verdad en vez de confiar en el l
 
 ## TP3 — Planificación y trazabilidad
 
-*(pendiente)*
+Project público: https://github.com/users/AugustoBuhler/projects/1
+
+### La duración del sprint, y por qué
+
+**Una semana.**
+
+La materia entrega un trabajo práctico por semana, y esa cadencia ya existe: no la
+inventé yo, la impone el calendario de la cátedra. Alinear el sprint con ella hace
+que el *sprint goal* sea concreto y verificable — "entregar el práctico de esta
+semana" — en vez de una lista de deseos sin fecha.
+
+Un sprint más largo tendría el problema opuesto al que resuelve: el objetivo dejaría
+de coincidir con ninguna entrega real, y la revisión al final del sprint llegaría
+cuando el trabajo ya se defendió. Un sprint de dos semanas, acá, agruparía dos TPs
+que se defienden por separado.
+
+Lo que **no** es un argumento válido —y el enunciado lo marca como anti-ejemplo— es
+elegir una duración larga "para no complicarme". La duración se justifica por el
+ritmo de entrega de valor, no por comodidad.
+
+### El límite de trabajo en progreso, y por qué ese número
+
+**Dos.**
+
+Es la regla de arranque: cantidad de personas + 1. Trabajando solo, 1 + 1 = 2.
+
+El "+1" no es un redondeo: es la **válvula**. Cuando una tarjeta queda esperando algo
+que no depende de mí —una corrida de CI, una respuesta, una revisión— necesito poder
+avanzar en otra cosa sin romper el acuerdo. Con límite 1 me quedaría bloqueado cada
+vez que algo espera; con límite 2 tengo exactamente una holgura.
+
+**Qué me haría subirlo:** que el trabajo se trabe seguido por dependencias externas
+reales, no por haber empezado demasiadas cosas.
+
+**Qué señal me diría que quedó demasiado alto:** que nunca lo alcance. Un límite que
+nunca se toca no está limitando nada — es decoración.
+
+**Y si lo subiera a diez:** dejaría de limitar por completo. Diez tarjetas en
+progreso significan diez cosas al 60% y **cero terminadas**. El trabajo empezado y no
+terminado no es productividad: es *inventario*, y el inventario tiene costo —más
+cambio de contexto, más ramas viejas, más conflictos al integrar. Es la traducción
+operativa de "empezar menos, terminar más".
+
+Ojo con un matiz que conviene tener claro: **la herramienta no bloquea**. GitHub pone
+el contador de la columna en rojo y te deja pasar igual. El límite es un acuerdo del
+equipo, no un candado.
+
+### El diagnóstico de la historia mal escrita
+
+La historia del ejercicio:
+
+> *"Como desarrollador quiero crear la tabla usuarios para guardar los datos."*
+
+**Por qué está mal:** es una **tarea disfrazada de historia**. Falla en las tres
+partes del formato:
+
+- **El rol está mal elegido.** El usuario de una historia es *quien recibe el valor*,
+  no quien programa. El desarrollador es quien la implementa, nunca su beneficiario.
+- **La capacidad fija el CÓMO, no el QUÉ.** "Crear la tabla usuarios" es una decisión
+  técnica —podría ser una tabla, un documento, un archivo—. El cómo es del equipo; la
+  historia debería decir qué capacidad gana alguien.
+- **El beneficio no es un beneficio.** "Para guardar los datos" repite el qué con
+  otras palabras. No explica qué mejora para nadie, así que no permite priorizarla.
+
+Además viola dos letras de INVEST: no es **V**aliosa (nadie "quiere" una tabla: es un
+medio) ni **T**esteable (no hay forma de demostrarle a alguien que "la tabla existe"
+le sirvió para algo).
+
+**Cómo la reescribiría**, sobre el dominio de mi app:
+
+> *Como recepcionista del consultorio quiero que los turnos que cargo queden
+> guardados entre sesiones para no tener que volver a cargarlos cada mañana.*
+>
+> **Criterios de aceptación**
+> - Un turno cargado sigue apareciendo después de cerrar y reabrir la aplicación
+> - Los turnos sobreviven al reinicio del sistema
+> - Al reiniciar borrando el almacenamiento, la lista vuelve vacía
+
+Ahora el rol es quien recibe valor, la capacidad no fija implementación (podría
+resolverse con cualquier motor de base de datos), el beneficio explica por qué
+importa, y los tres criterios se pueden verificar parándose frente a la pantalla.
+
+### Estructura entregada
+
+```
+#12  EPIC: Pipeline DevOps completo para mi app          [epic]    OPEN
+  └─ #13  CI: build y tests automáticos en cada PR       [story]   OPEN
+       ├─ #14  Escribir el workflow de build y tests     [task]    CLOSED ← por el PR #17
+       └─ #15  Publicar el reporte de tests como artefacto [task]  OPEN
+
+#16  El front muestra "Error 502" cuando el backend
+     todavía no responde                                 [bug]     OPEN
+```
+
+La jerarquía se armó con **sub-issues**, no con task-lists: las task-lists no crean la
+relación padre-hijo navegable, que es justamente lo que permite subir de la tarea a su
+historia y de ahí a la épica.
+
+**La épica no lleva criterios de aceptación** a propósito: no se verifica por sí misma,
+se da por cerrada cuando sus historias están cerradas. Los criterios van donde algo se
+puede comprobar.
+
+**El bug va al costado, no colgando de nadie.** La jerarquía cuenta lo que se planificó
+construir; un bug es un defecto de algo *ya construido*, así que no formaba parte del
+plan. Y colgarlo de la historia que lo originó haría que la barra de progreso de esa
+historia mienta.
+
+Sobre el bug: elegí uno **real de mi aplicación** en vez del genérico del video. Lo
+reproduje antes de reportarlo — `docker compose stop backend` y después pedirle
+`/api/turnos` al frontend devuelve una página HTML de nginx con código 502, que
+`frontend/src/api.js` no puede parsear como JSON y termina mostrando el texto crudo
+"Error 502" al usuario.
+
+### La trazabilidad
+
+El PR #17 implementa **una** de las dos tareas de la historia (la #14) y la cierra
+sola con `Closes #14` en la descripción. La cadena completa queda navegable:
+
+```
+tarea #14 (cerrada) → PR #17 → commit → historia #13 → épica #12
+```
+
+Dos detalles que importan y son fáciles de errar:
+
+- El número que va en `Closes` es el de **la tarea**, no el de la historia. Un PR
+  implementa una tarea concreta. Si cerrara la historia, la estaría dando por
+  terminada con la mitad del trabajo sin hacer, y la trazabilidad quedaría mintiendo.
+- La palabra clave va en la **descripción del PR**. Por mensaje de commit el issue
+  igual se cierra, pero **no queda enlazado al PR** — y ese enlace es justamente lo
+  que se navega al corregir.
+
+**La historia se entrega abierta.** Solo está cerrada la tarea que cerró el PR; la
+otra tarea y la historia siguen abiertas porque el trabajo continúa en el TP4.
+
+### Problemas encontrados y cómo los resolví
+
+**1. `gh` no puede crear campos de tipo Iteration.** El CLI solo soporta `TEXT`,
+`SINGLE_SELECT`, `DATE` y `NUMBER` (`gh project field-create --data-type`), y la
+mutación equivalente de la API GraphQL tampoco expone el tipo iteration. Lo mismo pasa
+con la vista Board y con el límite de la columna: son features de la interfaz de
+Projects v2 sin equivalente en la API. Esos tres pasos se hicieron desde la web.
+
+Es un buen ejemplo de algo que el enunciado insinúa sin decirlo: *"para uno, la web;
+para varios, el comando"*. Lo repetitivo (crear cinco issues, colgar la jerarquía,
+asignar estados) se automatiza; lo que se configura una sola vez, no vale la pena.
+
+**2. Quedó un Project vacío de un intento anterior.** Al explorar la interfaz se creó
+un segundo proyecto sin título. El entregable es el Project #1; el otro se elimina para
+que no haya ambigüedad sobre cuál mirar.
+
+> ⚠️ **AUGUSTO: agregá acá lo que te haya pasado a vos** configurando el board, el
+> campo Iteration o el límite de WIP.
+
+### Declaración de uso de IA
+
+> ⚠️ **AUGUSTO: completar.**
 
 ---
 
