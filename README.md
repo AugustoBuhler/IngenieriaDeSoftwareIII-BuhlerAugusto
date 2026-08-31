@@ -9,7 +9,7 @@ infraestructura como código y seguridad.
 
 | | |
 |---|---|
-| **Backend** | Node 22 + Express — API REST |
+| **Backend** | Node.js 22 con Express — API REST en JavaScript |
 | **Frontend** | React 18 + Vite, servido por nginx |
 | **Base de datos** | PostgreSQL 16 |
 | **Orquestación** | Docker Compose |
