@@ -452,4 +452,202 @@ que no haya ambigüedad sobre cuál mirar.
 
 ## TP4 — CI: Pipelines as Code
 
-*(pendiente)*
+### Estructura del pipeline: por qué esos jobs y por qué en paralelo
+
+Dos jobs, `build-backend` y `build-frontend`, uno por cada Dockerfile que tiene la
+aplicación. No es una división arbitraria: es la que ya existía en el TP2, y el
+pipeline la refleja en vez de inventar otra.
+
+**Corren en paralelo porque no dependen uno del otro.** El frontend no necesita nada
+que produzca el backend, así que serializarlos solo agregaría espera. Con dos jobs
+paralelos el pipeline tarda lo que tarda el más lento, no la suma.
+
+La contracara, y es lo que hay que tener presente: **dos jobs no comparten nada**.
+Cada uno corre en su propia máquina limpia y efímera, sin filesystem común. Si mañana
+uno necesitara algo que produce el otro, tendría que viajar como artefacto o
+declararse con `needs:` para forzar el orden — y eso costaría el paralelismo.
+
+Hay un beneficio secundario que se nota al fallar: cuando el build del frontend se
+rompió, `build-backend` siguió en verde. El check en rojo señala **exactamente** dónde
+está el problema, sin tener que leer un log gigante.
+
+### Qué cachea, y qué pasa si el cache desaparece
+
+**Qué se cachea: las capas de las imágenes**, no dependencias ni artefactos. Docker
+construye en capas —cada `RUN`, `COPY` y `ADD` deja una— y si una capa no cambió se
+puede reutilizar en lugar de rehacerla.
+
+Se guardan en el **cache de GitHub Actions** (`type=gha`), que no es el Docker de mi
+máquina ni el del runner: el runner nace vacío en cada corrida.
+
+Verificado en la segunda corrida del PR #20, sobre el backend:
+
+```
+#12 [build 4/6] RUN npm ci
+#12 CACHED
+#13 [build 6/6] RUN npm prune --omit=dev
+#13 CACHED
+#14 [final 3/5] COPY --from=build /app/node_modules ./node_modules
+#14 CACHED
+```
+
+Diecisiete capas reutilizadas entre los dos jobs. Que la capa del `npm ci` se
+reutilice es consecuencia directa de cómo está escrito el Dockerfile del TP2: copia
+`package*.json` e instala **antes** de copiar el código, así que cambiar una línea de
+código no invalida la instalación de dependencias.
+
+**Qué pasa si el cache desaparece: nada, salvo que tarda más.** La plataforma lo
+desaloja cuando quiere y tiene límite de tamaño, así que no es una garantía sino una
+optimización. Mi pipeline funciona idéntico sin él: reconstruye todas las capas desde
+cero y da el mismo resultado.
+
+Y la reversa, que es la propiedad importante: **si el pipeline *fallara* sin cache, no
+tendría un cache — tendría una dependencia escondida, y eso es un bug.** Un cache no
+puede ser un requisito para que algo funcione; solo puede acelerarlo.
+
+Un detalle contraintuitivo que conviene aclarar antes de que lo pregunten: **la
+segunda corrida no necesariamente tarda menos.** Guardar el cache también cuesta —al
+terminar, la corrida sube las capas al almacén— y cada corrida cae en una máquina
+distinta. En un proyecto de este tamaño la ganancia es chica. La evidencia de que el
+cache funciona es la palabra `CACHED` en el log, no el cronómetro.
+
+### Por qué el pipeline construye con mi Dockerfile
+
+Porque mi aplicación **ya se construye de una manera**: el Dockerfile multi-stage del
+TP2. El pipeline no inventa otra, usa ésa.
+
+Si el workflow compilara por su cuenta —con `npm ci` y `npm run build` escritos en el
+YAML— tendría **dos definiciones de build** que tarde o temprano divergen: alguien
+cambia una y se olvida de la otra. A partir de ahí estaría verificando una compilación
+distinta de la que después se despliega, que es exactamente el "pero en QA andaba" con
+otro disfraz. La imagen que se verifica tiene que ser la misma que corre.
+
+El efecto lateral es elegante: **en mi workflow no hay una sola línea de Node.** El
+pipeline no sabe qué hay adentro del contenedor — solo le pide a Docker que construya
+un contexto. Por eso el mismo archivo le serviría a un compañero con .NET, Java o
+Python: lo que cambia es el Dockerfile, no el pipeline.
+
+### La estrategia de branching, ahora elegida y justificada
+
+En el TP1 la cátedra dio las reglas porque todavía no había experiencia para elegirlas.
+Con el flujo funcionando y un pipeline encima, la decisión es mía.
+
+**Sigo con GitHub Flow**, y ahora con argumentos propios:
+
+- **GitFlow resuelve un problema que no tengo.** Sus ramas permanentes (`develop`,
+  `release/`, `hotfix/`) existen para mantener varias versiones en soporte simultáneo.
+  Yo tengo una sola versión desplegable: esa estructura sería burocracia sin beneficio.
+- **Trunk-based necesita algo que todavía no tengo.** Para integrar trabajo a medio
+  hacer sin romper nada hacen falta *feature flags* y una red de tests que ataje.
+  Los tests llegan en el TP5. Adoptarlo hoy sería quedarme con el riesgo sin la red.
+- **GitHub Flow es lo que mi repositorio ya hace cumplir.** La protección de `main`
+  exige que todo entre por Pull Request; GitHub Flow es trunk-based más esa
+  formalidad. Elegir otra cosa sería contradecir mi propia configuración.
+
+**Y sigo con squash**, por tres razones:
+
+- `main` queda lineal y legible: un commit = un Pull Request.
+- Revertir es trivial: un PR entero es un solo commit.
+- El paso a paso interno de un PR vale poco cuando los PRs son chicos, y no se pierde:
+  sigue vivo **en el PR**. En el #4, el commit que resolvió el conflicto está ahí
+  aunque `main` haya recibido uno solo.
+
+Con una advertencia que aprendí en carne propia: **el squash aplasta todo lo que la
+rama tenga**, incluido lo que no debería estar. En el PR #1 se llevó un commit de
+prueba que se había colado. No es un argumento contra squash — es la razón por la que
+hay que leer el diff antes de mergear.
+
+*(Ojo con el conteo: el fast-forward no es una opción del botón de merge. Es lo que
+pasa automáticamente cuando `main` no avanzó desde que salió la rama. Las opciones
+reales son tres.)*
+
+### El gate
+
+`main` ahora exige **dos condiciones** para aceptar un merge, y hacen falta las dos:
+
+1. Que el cambio entre por Pull Request — la puerta del TP1
+2. Que `build-backend` y `build-frontend` estén en verde — la verificación de hoy
+
+La puerta sin verificación no alcanza (entra cualquier cosa revisada a ojo), y la
+verificación sin puerta tampoco (el pipeline informa pero nadie está obligado a
+mirarlo). El pipeline es **exactamente el mismo** con gate y sin gate: lo único que
+cambia es una casilla de configuración del repositorio.
+
+**`strict: true`** agrega que la rama tenga incorporado el `main` actual antes de
+mergear. Se demostró con el PR #21: quedó abierto mientras se mergeaba el #22, su
+verde quedó viejo —se había sacado contra un `main` que ya no existía— y tuvo que
+incorporar `main` y volver a correr el pipeline **sobre la mezcla**. Con un solo PR
+abierto ese mecanismo no se puede ver.
+
+**Los `contexts` son el id del job**, no su nombre para humanos. Solo valen mientras
+el job no declare un `name:`; si se lo agregara, el gate quedaría esperando un check
+que ya no existe y bloquearía todos los merges.
+
+### La demostración del gate
+
+PR #22, con la secuencia completa en su historial:
+
+| Paso | Qué pasó |
+|---|---|
+| Rotura | `import` a `./utilidades-que-no-existen.js` en `App.jsx` |
+| Verificación local | `docker build ./frontend` → exit 1, `Could not resolve …` |
+| Corrida 1 | `build-frontend` **failure** · `build-backend` success |
+| Merge | **Bloqueado**: `the base branch policy prohibits the merge` |
+| Fix | Commit que saca el import |
+| Corrida 2 | Los dos en **success**, el pipeline re-corrió solo |
+| Merge | Destrabado y mergeado |
+
+El PR se **mergeó**, no se cerró: así queda en el historial con sus dos commits y sus
+dos corridas, que es la evidencia.
+
+**Por qué rompí el frontend y no el backend.** Es una diferencia de stack que vale la
+pena explicar. El frontend **se empaqueta**: Vite resuelve los imports durante el build
+y falla si un archivo no existe. El backend, en cambio, es Express — **ni compila ni
+se empaqueta**: su Dockerfile hace `npm ci`, copia el código y nada más. Nunca lo
+ejecuta. Si hubiera escrito un import roto en `backend/src/index.js`, **el pipeline
+habría dado verde igual**, y el error habría aparecido recién al arrancar el
+contenedor, cosa que el pipeline no hace. Para romper el backend habría tenido que
+romper una **dependencia** (un paquete inexistente en su `package.json`, que hace
+fallar el `npm ci`).
+
+Es una limitación real de lo que un pipeline de build puede verificar en un stack
+interpretado, y se resuelve en el TP5: con tests, el pipeline sí ejecuta el código.
+
+### El badge
+
+```markdown
+[![CI](.../actions/workflows/ci.yml/badge.svg)](.../actions/workflows/ci.yml)
+```
+
+**Son dos URLs, no una.** La de adentro es la imagen; la de afuera es adónde lleva al
+hacerle clic. Escribiendo solo la imagen el badge se ve igual, pero al clickearlo se
+abre el SVG suelto — una página en blanco. Y usa el nombre del **archivo**
+(`ci.yml`), no el `name:` del workflow: renombrar el archivo rompe el badge.
+
+### Problemas encontrados y cómo los resolví
+
+**1. Fijé versiones de actions distintas a las de la guía.** La guía usa
+`actions/checkout@v6`, `docker/setup-buildx-action@v4` y `docker/build-push-action@v7`.
+Usé `@v4`, `@v3` y `@v6` respectivamente, que verifiqué que funcionan en la corrida
+real. La decisión de fondo es la misma que explica la guía: **la versión se fija a
+propósito**. Sin fijarla (`@main`), el pipeline cambiaría solo el día que sus autores
+publiquen algo — un pipeline que se modifica sin que nadie lo haya tocado es
+exactamente lo que Pipeline as Code viene a evitar.
+
+**2. El `PUT` de la protección reescribe todo, no agrega.** Antes de configurar el
+gate respaldé la protección existente, porque todo campo omitido en el JSON vuelve a
+su default: si no hubiera re-declarado `required_approving_review_count: 0` y
+`enforce_admins: true`, habría perdido silenciosamente lo configurado en el TP1.
+Verifiqué el estado después de aplicarlo, no solo antes.
+
+**3. El orden importa y el enunciado avisa por qué.** El gate solo puede exigir checks
+que ya corrieron, así que la configuración va **después** de la primera corrida. Y la
+demostración del gate va **después** de mergear el PR del workflow: si ese PR siguiera
+abierto, en `main` quedaría el esqueleto del TP3 —que solo hace checkout— y daría
+verde sobre código que no compila.
+
+> ⚠️ **AUGUSTO: agregá acá lo que te haya pasado a vos.**
+
+### Declaración de uso de IA
+
+> ⚠️ **AUGUSTO: completar.**
