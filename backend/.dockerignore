@@ -1,0 +1,8 @@
+# node_modules de la maquina host: si entran, pisan los que instala npm ci
+# para Linux y el contenedor arranca con binarios de la arquitectura equivocada.
+node_modules/
+
+.git/
+.env
+*.log
+coverage/
