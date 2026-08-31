@@ -1,0 +1,10 @@
+# Sin esto, el COPY . . mete los node_modules de la Mac encima de los que
+# npm ci instalo para Linux. Vite usa binarios compilados por plataforma, asi
+# que el build muere con "You installed esbuild for another platform" o
+# "Cannot find module @rollup/rollup-linux-x64-musl".
+node_modules/
+
+dist/
+.git/
+.env
+*.log

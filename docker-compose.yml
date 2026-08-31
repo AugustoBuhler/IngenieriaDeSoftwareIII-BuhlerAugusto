@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: app
+    volumes:
+      # VOLUMEN NOMBRADO (no empieza con ./): lo administra Docker y SOBREVIVE a
+      # `docker compose down`. Con `down -v` si se borra, y los datos se pierden.
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      # "Arranco" no es "esta listo": el contenedor levanta en un segundo, pero
+      # PostgreSQL tarda varios mas en aceptar conexiones.
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      # `db` es el NOMBRE DEL SERVICIO. Compose crea una red interna con DNS
+      # embebido, asi que el backend encuentra la base por nombre y no por IP:
+      # no importa en que direccion cayo el contenedor.
+      DATABASE_URL: postgres://postgres:${DB_PASSWORD}@db:5432/app
+    ports:
+      # Publicado para poder pegarle con curl/Postman. El navegador entra por el
+      # 3000: su JavaScript corre FUERA de la red de compose.
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
