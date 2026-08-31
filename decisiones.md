@@ -419,11 +419,19 @@ otra tarea y la historia siguen abiertas porque el trabajo continúa en el TP4.
 
 ### Problemas encontrados y cómo los resolví
 
-**1. `gh` no puede crear campos de tipo Iteration.** El CLI solo soporta `TEXT`,
-`SINGLE_SELECT`, `DATE` y `NUMBER` (`gh project field-create --data-type`), y la
-mutación equivalente de la API GraphQL tampoco expone el tipo iteration. Lo mismo pasa
-con la vista Board y con el límite de la columna: son features de la interfaz de
-Projects v2 sin equivalente en la API. Esos tres pasos se hicieron desde la web.
+**1. El CLI de `gh` no puede crear campos de tipo Iteration — pero la API sí.**
+`gh project field-create --data-type` solo acepta `TEXT`, `SINGLE_SELECT`, `DATE` y
+`NUMBER`. Di por sentado que la limitación venía de la plataforma y me equivoqué: al
+introspeccionar el esquema GraphQL, el enum `ProjectV2CustomFieldType` **sí** incluye
+`ITERATION`, y `createProjectV2Field` acepta un `iterationConfiguration`. El campo se
+creó por API.
+
+Lo que **sí** es genuinamente web-only es el **límite de la columna**: lo verifiqué
+introspeccionando el tipo `ProjectV2View`, que no expone ninguna configuración de
+límites por columna. Ese paso se hizo a mano.
+
+La lección práctica: cuando el CLI no puede algo, conviene revisar la API antes de
+resignarse — el CLI es un envoltorio parcial, no el límite de la plataforma.
 
 Es un buen ejemplo de algo que el enunciado insinúa sin decirlo: *"para uno, la web;
 para varios, el comando"*. Lo repetitivo (crear cinco issues, colgar la jerarquía,
