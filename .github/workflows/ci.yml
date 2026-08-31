@@ -1,0 +1,15 @@
+name: CI
+
+# Por ahora solo verifica que el codigo se pueda bajar al runner.
+# Los jobs de build con los Dockerfiles, el cache de capas y el gate
+# llegan en el TP4.
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar el codigo al runner
+        uses: actions/checkout@v4
