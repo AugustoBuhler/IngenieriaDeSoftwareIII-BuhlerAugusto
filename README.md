@@ -1,6 +1,6 @@
 # IngSoft3 — Sistema de Turnos de Consultorio
 
-Aplicación full-stack para gestionar turnos de un consultorio: pacientes,
+Aplicacion web para administrar la agenda de un consultorio medico: alta de
 profesionales y la agenda que los cruza. Es la app del semestre de **Ingeniería
 del Software 3** (UCC, 2026) — cada trabajo práctico le agrega una capa del
 sistema de entrega: contenedores, planificación, CI, tests, despliegue,
