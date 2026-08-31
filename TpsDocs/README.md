@@ -8,7 +8,7 @@ comandos, qué salió mal y qué hay que poder explicar en la defensa.
 | [TP1.md](TP1.md) | Git colaborativo | 5% | **cerrado** · `v1.0.0` |
 | [TP2.md](TP2.md) | Contenedores | 40% | **cerrado** · `v2.0.0` |
 | [TP3.md](TP3.md) | Planificación y trazabilidad | 10% | **cerrado** · `v3.0.0` |
-| TP4.md | CI · Pipelines as Code | 45% | pendiente |
+| [TP4.md](TP4.md) | CI · Pipelines as Code | 45% | en curso |
 
 ## Qué es esto y qué NO es
 
