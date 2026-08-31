@@ -1,0 +1,42 @@
+# Misma topologia que docker-compose.yml — mismos servicios, mismo volumen,
+# mismo healthcheck, mismo depends_on. Lo UNICO que cambia son las dos lineas
+# donde decia `build:`: aca dice `image:`.
+#
+# Para que sirve: este archivo levanta el sistema SIN el codigo fuente. No
+# construye nada, descarga las imagenes ya publicadas. Es como va a consumir tu
+# app un entorno de QA o de produccion.
+#
+# Necesita el .env igual que el otro:  cp .env.example .env
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: app
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    image: ghcr.io/augustobuhler/turnos-backend:v0.1.0   # antes: build: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:${DB_PASSWORD}@db:5432/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: ghcr.io/augustobuhler/turnos-frontend:v0.1.0  # antes: build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
