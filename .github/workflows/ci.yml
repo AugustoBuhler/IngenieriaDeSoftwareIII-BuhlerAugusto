@@ -1,15 +1,62 @@
 name: CI
 
-# Por ahora solo verifica que el codigo se pueda bajar al runner.
-# Los jobs de build con los Dockerfiles, el cache de capas y el gate
-# llegan en el TP4.
 on:
   pull_request:
-    branches: [main]
+    branches: [main]      # verifica ANTES del merge: es lo que alimenta al gate
+  push:
+    branches: [main]      # deja constancia de como quedo main: la corrida que lee el badge
+                          # y la que deja el cache para todos
 
 jobs:
-  build:
+  # Los dos jobs no dependen uno del otro, asi que corren EN PARALELO, cada uno
+  # en su propia maquina limpia. No comparten filesystem.
+  build-backend:
     runs-on: ubuntu-latest
     steps:
+      - name: Que estamos verificando
+        env:
+          # En un PR, GITHUB_REF_NAME vale "<numero>/merge" porque GitHub construye
+          # la mezcla de la rama con main. head_ref si es la rama de verdad.
+          RAMA: ${{ github.head_ref || github.ref_name }}
+        run: echo "Rama $RAMA · commit $GITHUB_SHA"
+
       - name: Bajar el codigo al runner
         uses: actions/checkout@v4
+
+      # Sin este paso el build FALLA: el constructor de fabrica guarda las capas
+      # en el disco de la maquina, que se destruye al terminar la corrida.
+      - name: Preparar el constructor que sabe cachear
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir la imagen del backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend        # el Dockerfile multi-stage del TP2
+          push: false               # hoy no se publica en ningun lado
+          tags: backend:ci
+          # scope distinto por job: sin esto los dos comparten estante y se pisan
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Que estamos verificando
+        env:
+          RAMA: ${{ github.head_ref || github.ref_name }}
+        run: echo "Rama $RAMA · commit $GITHUB_SHA"
+
+      - name: Bajar el codigo al runner
+        uses: actions/checkout@v4
+
+      - name: Preparar el constructor que sabe cachear
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir la imagen del frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          tags: frontend:ci
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
