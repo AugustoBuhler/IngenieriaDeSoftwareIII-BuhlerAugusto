@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { api } from './api.js';
-import { formatearFecha } from './utilidades-que-no-existen.js';
 
 const PANTALLAS = ['Turnos', 'Pacientes', 'Profesionales'];
 
