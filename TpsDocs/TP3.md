@@ -30,12 +30,12 @@ Lo único que se decide —y lo único que se defiende de verdad— son **tres c
 | 5 | 2 tareas de esa historia | ✅ #14 #15 |
 | 6 | 1 bug, **al costado** de la jerarquía | ✅ #16 |
 | 7 | Jerarquía navegable por **sub-issues** | ✅ |
-| 8 | Sprint con duración justificada | ⬜ campo Iteration (web) |
-| 9 | Board con automatización mínima | ⬜ vista Board (web) · automatización ✅ |
+| 8 | Sprint con duración justificada | ✅ campo `Sprint`, iteraciones de 7 días |
+| 9 | Board con automatización mínima | ✅ vista *Tablero* · automatización verificada |
 | 10 | Límite de WIP configurado | ⬜ (web) |
 | 11 | 1 PR mergeado que cierra su issue solo | ✅ PR #17 → cierra #14 |
 | 12 | `decisiones.md` con las 5 cosas | ✅ falta declaración de IA |
-| 13 | Tag `v3.0.0` + release | ⬜ |
+| 13 | Tag `v3.0.0` + release | ✅ |
 
 ---
 
@@ -120,13 +120,33 @@ genérico, mostrándole al usuario el texto crudo **"Error 502"**.
 
 ## 2 · El tablero
 
-| Columna | Items |
-|---|---|
-| **Todo** | #15 (tarea pendiente) · #16 (bug) |
-| **In Progress** | #12 (épica) · #13 (historia) |
-| **Done** | #14 (cerrada sola por el PR #17) |
+Dos vistas sobre los mismos items: **Backlog** (tabla) y **Tablero** (board por Status).
+
+| Columna | Sprint | Items |
+|---|---|---|
+| **Todo** | Sprint 1 | #15 Publicar el reporte de tests como artefacto |
+| **Todo** | — | #16 [bug] El front muestra "Error 502"… |
+| **In Progress** | — | #12 EPIC: Pipeline DevOps completo |
+| **In Progress** | Sprint 1 | #13 CI: build y tests automáticos en cada PR |
+| **Done** | Sprint 1 | #14 Escribir el workflow (cerrada sola por el PR #17) |
 
 *In Progress* tiene exactamente **2** items: justo en el límite de WIP.
+
+### El campo Sprint
+
+Iteraciones de **7 días**, la primera arrancando el 31/8. Asignado a la historia #13 y
+a sus dos tareas #14 y #15 — el enunciado pide exactamente eso. La épica y el bug
+quedan sin sprint a propósito: una épica dura meses y un bug todavía no se priorizó.
+
+El campo se creó por la API GraphQL (`createProjectV2Field` con `dataType: ITERATION`).
+**El CLI de `gh` no puede**: `gh project field-create` solo acepta `TEXT`,
+`SINGLE_SELECT`, `DATE` y `NUMBER`. La API sí, con `iterationConfiguration`.
+
+### El README del Project
+
+El tablero lleva su propio README explicando cómo leerlo, con enlaces a `decisiones.md`
+y a este documento. Así quien entre por el tablero llega a las decisiones, y quien entre
+por el repositorio llega al tablero (está vinculado, pestaña *Projects*).
 
 ### La automatización, verificada
 
