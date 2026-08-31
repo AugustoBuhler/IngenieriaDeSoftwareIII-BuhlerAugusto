@@ -184,7 +184,67 @@ ghcr.io/augustobuhler/turnos-frontend:v0.1.0
 
 ### 6. `docker-compose.registry.yml`: el sistema sin el código
 
-*(pendiente — se completa al probar el compose de registry)*
+Decir que un package es público es fácil; la prueba es **bajarlo sin credenciales**.
+Antes de levantarlo hubo que vaciar los tres lugares donde Docker esconde las capas
+—la imagen que construyó el compose, los nombres que le puse yo, y el caché de
+construcción—, porque si no el `up` contesta `Already exists` y no descarga nada:
+
+```bash
+$ docker compose down --rmi local
+$ docker logout ghcr.io
+Removing login credentials for ghcr.io
+$ docker rmi ghcr.io/augustobuhler/turnos-backend:v0.1.0 ghcr.io/augustobuhler/turnos-frontend:v0.1.0
+$ docker builder prune -af
+```
+
+Y recién ahí, **sin sesión iniciada en el registry**:
+
+```bash
+$ docker compose -f docker-compose.registry.yml up -d
+ frontend Pulling
+ backend Pulling
+ 7891cfa3d49e Pulling fs layer
+ 21e7d9fd39b2 Pulling fs layer
+ e6be5d00821a Pulling fs layer
+ frontend Pulled
+ backend Pulled
+ Container ...-db-1        Started
+ Container ...-db-1        Waiting
+ Container ...-db-1        Healthy
+ Container ...-backend-1   Started
+ Container ...-frontend-1  Started
+```
+
+Descargó las dos imágenes estando deslogueado: eso es lo que prueba que son
+públicas, no que la página diga *Public*.
+
+**La verificación central de este práctico** — la columna `IMAGE` tiene que decir
+`ghcr.io/...`. Si dijera `<carpeta>-backend`, el compose estaría construyendo en vez
+de descargando, y no valdría:
+
+```
+$ docker compose -f docker-compose.registry.yml ps
+
+SERVICE    IMAGE                                          STATUS
+backend    ghcr.io/augustobuhler/turnos-backend:v0.1.0    Up 10 seconds
+db         postgres:16-alpine                             Up 15 seconds (healthy)
+frontend   ghcr.io/augustobuhler/turnos-frontend:v0.1.0   Up 10 seconds
+```
+
+Y el sistema funcionando desde esas imágenes descargadas:
+
+```bash
+$ curl -s localhost:8080/health
+{"status":"ok"}
+
+$ curl -s -X POST localhost:8080/api/profesionales -d '{"nombre":"Dr. Garcia","especialidad":"Pediatria"}'
+{"id":1,"nombre":"Dr. Garcia","especialidad":"Pediatria"}
+
+$ curl -s -o /dev/null -w "%{http_code}" localhost:3000            # la SPA
+200
+$ curl -s -o /dev/null -w "%{http_code}" localhost:3000/api/profesionales   # el proxy
+200
+```
 
 ---
 
