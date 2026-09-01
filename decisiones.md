@@ -89,24 +89,21 @@ descripción del PR no mencionaba. Cinco segundos de revisión lo habrían agarr
 Es literalmente para lo que existe el code review, y la primera pregunta que hay
 que hacerle a un PR: *¿hace lo que dice que hace?*
 
-> ⚠️ **AUGUSTO: revisá esta sección y agregá cualquier otro problema que hayas
-> tenido vos** (con el editor web, con las capturas, con `gh auth login`, lo que
-> sea). Los tropiezos propios valen más que los prolijos.
-
 ### Declaración de uso de IA
 
-> ⚠️ **AUGUSTO: esto lo tenés que escribir vos y tiene que ser verdad.** Te dejo el
-> esqueleto de lo que efectivamente pasó, verificalo y ponelo con tus palabras.
->
-> - **Qué hizo la IA**: asistencia con Claude Code para la configuración del
->   repositorio (protección de rama por API, creación de ramas y PRs), la redacción
->   de esta documentación, y la construcción de la app del TP2.
-> - **Qué hice yo**: la resolución del conflicto en el editor web (decidir qué
->   contenido quedaba), las capturas, la publicación de las releases, y las
->   decisiones de qué entregar.
-> - **Cómo lo verifiqué**: ← *esto es lo que más pesa. ¿Corriste los comandos y
->   viste la salida? ¿Abriste el repo en el navegador y comprobaste el estado?
->   ¿Levantaste el sistema y lo usaste? Sé concreto.*
+Usé Claude Code como asistente durante todo el práctico, en el rol de operador:
+ejecutó comandos de `git` y `gh` que yo dirigí, y redactó los borradores de esta documentación a partir de lo que fuimos haciendo.
+
+**Qué hizo la IA:** aplicó la protección de rama contra la API de GitHub, creó las ramas y los Pull Requests, y armó la primera versión de este archivo y de `evidencias.md`.
+
+**Qué hice yo:** la resolución del conflicto, que es la parte que no se delega — resolver es decidir qué contenido queda, no ejecutar un comando: elegí quedarme con
+el título que ya estaba en `main` y por eso el PR #4 figura con *Files changed: 0*.
+También corrí la prueba de push directo, saqué las capturas y publiqué la release.
+
+**Cómo lo verifiqué:** el push rechazado lo ejecuté en mi terminal y leí el error completo (`GH006`, con el prefijo `remote:` que indica que el rechazo viene del servidor y no de Git local). El estado de la protección lo consulté por API antes y después de aplicarla, en vez de confiar en que el comando hubiera funcionado.
+
+**Lo que aprendí por error propio:** en el PR #1 no leí el diff antes de mergear y se coló un commit que no correspondía. Eso me enseñó dos cosas que ahora puedo explicar:
+que un Pull Request sigue a la rama y no al commit, y que la primera pregunta de un code review —¿hace lo que dice que hace?— existe justamente para eso.
 
 ---
 
@@ -267,17 +264,23 @@ recién falle el `push` con `denied: permission_denied`. Lo evité usando el tok
 `gh` con el scope `write:packages` agregado (`gh auth refresh -s write:packages`),
 y verifiqué que funcionaba haciendo el push de verdad en vez de confiar en el login.
 
-> ⚠️ **AUGUSTO: agregá acá los problemas que hayas tenido vos** — algo que no
-> arrancó, un puerto ocupado, un comando que falló. Si no tuviste ninguno, decilo,
-> pero pensalo dos veces: casi siempre hubo alguno.
-
 ### Declaración de uso de IA
 
-> ⚠️ **AUGUSTO: completar, igual que en el TP1.** Lo importante acá es que la app la
-> escribió la IA, y eso hay que decirlo con todas las letras — está permitido y
-> alentado. Lo que se evalúa es que la entiendas: la pregunta sobre tu caso puede
-> apuntar a una línea concreta de `backend/src/reglas.js`. Leelo entero antes del
-> miércoles.
+**Qué hizo la IA:** escribió el código de la aplicación, los dos Dockerfiles multi-stage, el `nginx.conf`, los dos archivos de compose y el `README` de arranque.
+
+**Qué decidí yo:** el dominio de la aplicación y sus siete reglas de negocio. Las elegí con un criterio concreto que está en `elegir-app.md`: el TP5 pide 8 tests de backend y 4 de frontend, y para eso hacen falta entre 4 y 6 reglas — validaciones,cálculos, transiciones de estado, restricciones. Un CRUD de altas y bajas me habría
+dejado sin nada que testear en noviembre. También decidí que la limitación de arquitectura de las imágenes se declarara explícitamente en vez de dejarla pasar.
+
+**Cómo lo verifiqué:**
+
+- Probé las siete reglas una por una con `curl` y comprobé que devolvieran 400 con su mensaje: DNI duplicado, DNI con formato inválido, turno en fecha pasada, turno solapado, cupo diario, transición de estado prohibida y borrado de un profesional con turnos pendientes.
+- Corrí la prueba de persistencia completa: `down` + `up` conserva los turnos, `down -v` los borra.
+- Medí el multi-stage construyendo explícitamente la etapa `build` (`docker build --target build`) y comparándola contra la imagen final, en vez de citar un número de memoria: 370 MB contra 93 MB en el frontend.
+- Para comprobar que las imágenes eran públicas de verdad me deslogueé de ghcr, borré las imágenes locales y vacié el caché de construcción, y recién ahí levanté el sistema con `docker-compose.registry.yml`. Que la página diga "Public" no prueba nada; bajar la imagen sin credenciales, sí.
+- Cloné el repositorio en una carpeta limpia y lo levanté siguiendo mi propio README, que es lo que se pide en la defensa.
+
+**Sobre la arquitectura:** las imágenes están construidas para `linux/arm64` porque las armé en una MacBook Air con Apple Silicon. Lo verifiqué con `docker manifest inspect`. En una máquina Intel el pull falla con `no matching manifest for linux/amd64`. No es un error de configuración: una imagen contiene binarios compilados para un procesador. Se resuelve en el TP7 con
+`docker buildx`.
 
 ---
 
@@ -441,12 +444,22 @@ asignar estados) se automatiza; lo que se configura una sola vez, no vale la pen
 un segundo proyecto sin título. El entregable es el Project #1; el otro se elimina para
 que no haya ambigüedad sobre cuál mirar.
 
-> ⚠️ **AUGUSTO: agregá acá lo que te haya pasado a vos** configurando el board, el
-> campo Iteration o el límite de WIP.
-
 ### Declaración de uso de IA
 
-> ⚠️ **AUGUSTO: completar.**
+**Qué hizo la IA:** creó las etiquetas, los cinco issues, la jerarquía de sub-issues y el campo Sprint, todo contra la API de GitHub, y redactó el borrador de esta sección.
+
+**Qué decidí yo:** las tres cosas que este práctico deja explícitamente a criterio del alumno — la duración del sprint, el límite de trabajo en progreso y el diagnóstico de
+la historia mal escrita. Están justificadas más arriba, y las justificaciones son mías:
+el sprint de una semana sale de alinearlo con la cadencia de entrega de la materia, y el límite de 2 de la regla personas + 1, donde el "+1" es la válvula para cuando algo
+queda esperando algo externo.
+
+También decidí reportar un bug **real de mi aplicación** en vez del genérico del video, que el enunciado permitía. Lo reproduje antes de escribirlo.
+
+**Cómo lo verifiqué:** navegué la cadena de trazabilidad completa en la interfaz — desde la tarjeta de la tarjeta #14 en *Done*, al PR #17 que la cerró, al commit, y
+hacia arriba hasta la historia y la épica. Comprobé que la automatización *"Item closed → Done"* hubiera movido la tarjeta sola, y que la historia #13 siguiera **abierta**: el workflow del Project actúa sobre el estado de cada item, no cierra una historia porque se hayan cerrado sus sub-issues.
+
+**Un error que corregí a tiempo:** la IA afirmó que la API de GitHub no permitía crear campos de tipo Iteration y que había que hacerlo a mano. Al revisarlo resultó falso —
+el CLI de `gh` no lo soporta, pero la mutación `createProjectV2Field` de la API sí acepta `dataType: ITERATION`. Quedó documentado arriba como problema, porque la lección es aprovechable: el CLI es un envoltorio parcial, no el límite de la plataforma.
 
 ---
 
@@ -646,8 +659,27 @@ demostración del gate va **después** de mergear el PR del workflow: si ese PR 
 abierto, en `main` quedaría el esqueleto del TP3 —que solo hace checkout— y daría
 verde sobre código que no compila.
 
-> ⚠️ **AUGUSTO: agregá acá lo que te haya pasado a vos.**
-
 ### Declaración de uso de IA
 
-> ⚠️ **AUGUSTO: completar.**
+**Qué hizo la IA:** escribió el workflow, configuró el gate contra la API de GitHub y redactó el borrador de esta sección.
+
+**Qué decidí yo:** qué romper para demostrar el gate, y por qué. Elegí el frontend sabiendo que el backend no habría servido: Express ni compila ni se empaqueta, así que
+su Dockerfile copia el código sin ejecutarlo nunca y un import roto habría dado verde igual. También elegí y justifiqué la estrategia de branching, que el TP1 dejaba
+pendiente para este práctico.
+
+**Cómo lo verifiqué:**
+
+- Antes de subir la rotura comprobé que el build fallara **también en mi máquina**, con
+  `docker build ./frontend`. El error fue el mismo que después dio el runner:
+  `Could not resolve "./utilidades-que-no-existen.js"`.
+- Leí el log de la segunda corrida buscando la palabra `CACHED`, no el cronómetro: son
+  17 capas reutilizadas, y la del `RUN npm ci` entre ellas. El tiempo no es evidencia
+  válida — guardar el cache también cuesta, y una segunda corrida puede tardar más.
+- Intenté mergear el PR con el check en rojo a propósito, para ver el rechazo con mis
+  ojos: `the base branch policy prohibits the merge`. Vale la pena notar el matiz que
+  devuelve la API: `mergeable: MERGEABLE` pero `estado: BLOCKED` — que el merge sea
+  posible no significa que esté permitido.
+- Antes de tocar la protección de rama respaldé la existente, porque el `PUT` la
+  reescribe entera y todo campo omitido vuelve a su default. Verifiqué después de
+  aplicarla que `approvals: 0` y `enforce_admins: true` siguieran en pie: si no los
+  hubiera re-declarado, habría perdido en silencio lo configurado en el TP1.
