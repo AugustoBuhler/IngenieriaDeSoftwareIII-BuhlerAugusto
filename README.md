@@ -122,4 +122,3 @@ cd frontend && npm install && npm run dev   # SPA en :5173 (Vite proxea /api)
 ---
 
 *Repositorio de cursada — [decisiones.md](decisiones.md) · [evidencias.md](evidencias.md) · [TpsDocs/](TpsDocs/)*
-prueba
