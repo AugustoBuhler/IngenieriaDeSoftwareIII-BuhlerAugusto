@@ -3,7 +3,6 @@
 [![CI](https://github.com/AugustoBuhler/IngenieriaDeSoftwareIII-BuhlerAugusto/actions/workflows/ci.yml/badge.svg)](https://github.com/AugustoBuhler/IngenieriaDeSoftwareIII-BuhlerAugusto/actions/workflows/ci.yml)
 
 Aplicación full-stack para gestionar turnos de un consultorio: pacientes,
-
 profesionales y la agenda que los cruza. Es la app del semestre de **Ingeniería
 del Software 3** (UCC, 2026) — cada trabajo práctico le agrega una capa del
 sistema de entrega: contenedores, planificación, CI, tests, despliegue,
