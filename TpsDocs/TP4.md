@@ -15,8 +15,8 @@
 | 4 | **Required status checks** activos sobre `main` | ✅ + `strict` |
 | 5 | **Demostración del gate**: rojo → bloqueado → fix → verde → merge | ✅ PR #22 |
 | 6 | **Status badge** en el README | ✅ `passing` |
-| 7 | `decisiones.md` con las cinco cosas | ✅ salvo IA |
-| 8 | Tag `v4.0.0` + release | ✅ |
+| 7 | `decisiones.md` con las cinco cosas | ✅ con la declaración de IA |
+| 8 | Tag `v4.0.0` + release | ✅ `v4.0.0` sobre `54d0277` |
 
 ---
 
@@ -316,4 +316,33 @@ branch policies.
 
 ## 6 · Uso de IA
 
-*(Va en `decisiones.md`. Completar.)*
+La declaración formal vive en `decisiones.md`, al cierre de la sección `## TP4` —
+**está completa**.
+
+En resumen: la IA escribió el workflow, configuró el gate contra la API de GitHub y
+redactó el borrador de la sección. Lo decidido de forma propia fue **qué romper para
+demostrar el gate, y por qué**: se eligió el frontend sabiendo que el backend no habría
+servido — Express ni compila ni se empaqueta, así que su Dockerfile copia el código sin
+ejecutarlo nunca y un import roto habría dado verde igual. También fue propia la
+elección y justificación de la estrategia de branching, que el TP1 dejaba pendiente para
+este práctico.
+
+Cómo se verificó:
+
+- La rotura se comprobó **primero en la máquina local**, con `docker build ./frontend`,
+  antes de subirla. El error fue el mismo que después dio el runner:
+  `Could not resolve "./utilidades-que-no-existen.js"`.
+- El cache se verificó **leyendo el log y buscando `CACHED`**, no mirando el cronómetro:
+  17 capas reutilizadas. El tiempo no es evidencia válida — guardar el cache también
+  cuesta, y una segunda corrida puede tardar más.
+- El bloqueo se provocó a propósito, intentando mergear con el check en rojo, para leer
+  el rechazo de primera mano: `the base branch policy prohibits the merge`.
+- Antes de tocar la protección de rama se respaldó la existente, porque el `PUT` la
+  reescribe entera, y se verificó **después** de aplicarla que `approvals: 0` y
+  `enforce_admins: true` siguieran en pie.
+
+> 📌 **Nota sobre el tag.** `v4.0.0` quedó sobre `54d0277` (PR #24). El PR #25, que
+> completó las declaraciones de uso de IA de los cuatro prácticos, se mergeó después —
+> dentro del plazo, pero posterior al tag. La versión completa de `decisiones.md` está en
+> `main`, que es lo que se corrige; el tag apunta al commit anterior. Si hiciera falta
+> alinearlo, se mueve con `git tag -f v4.0.0 && git push -f origin v4.0.0`.

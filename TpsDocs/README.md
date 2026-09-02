@@ -8,7 +8,9 @@ comandos, qué salió mal y qué hay que poder explicar en la defensa.
 | [TP1.md](TP1.md) | Git colaborativo | 5% | **cerrado** · `v1.0.0` |
 | [TP2.md](TP2.md) | Contenedores | 40% | **cerrado** · `v2.0.0` |
 | [TP3.md](TP3.md) | Planificación y trazabilidad | 10% | **cerrado** · `v3.0.0` |
-| [TP4.md](TP4.md) | CI · Pipelines as Code | 45% | en curso |
+| [TP4.md](TP4.md) | CI · Pipelines as Code | 45% | **cerrado** · `v4.0.0` |
+
+Los cuatro prácticos del bloque **P1** están cerrados, con su tag y su release.
 
 ## Qué es esto y qué NO es
 
@@ -21,7 +23,9 @@ Lo que la cátedra corrige vive en la **raíz** del repositorio:
 
 Estos documentos son más largos y más detallados: registran el paso a paso, los
 comandos exactos con su salida real, los errores que aparecieron, y las preguntas
-de defensa con su respuesta. Sirven para preparar los 6 minutos de la mesa.
+de defensa con su respuesta. Sirven para preparar los **6:11** de la mesa (grupo B),
+donde se muestran los cuatro TPs en orden y se responde una pregunta por cada uno más
+una sobre el propio repositorio.
 
 ## Convención de capturas
 

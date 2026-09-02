@@ -358,4 +358,24 @@ docker compose up -d --build
 
 ## 8 · Uso de IA
 
-*(Va en `decisiones.md`. Completar con honestidad.)*
+La declaración formal vive en `decisiones.md`, al cierre de la sección `## TP2` —
+**está completa**.
+
+En resumen: la IA escribió el código de la aplicación, los dos Dockerfiles multi-stage,
+el `nginx.conf`, los dos archivos de compose y el README de arranque. Lo decidido de
+forma propia fue **el dominio de la aplicación y sus siete reglas de negocio**, con un
+criterio concreto de `elegir-app.md`: el TP5 pide 8 tests de backend y 4 de frontend, y
+para eso hacen falta entre 4 y 6 reglas. Un CRUD de altas y bajas habría dejado sin nada
+que testear en noviembre. También fue decisión propia declarar explícitamente la
+limitación de arquitectura de las imágenes en vez de dejarla pasar.
+
+Cómo se verificó, que es la parte que se defiende:
+
+- Las siete reglas, una por una con `curl`, comprobando que devolvieran 400 con su
+  mensaje.
+- La persistencia completa: `down` + `up` conserva los turnos, `down -v` los borra.
+- El multi-stage **medido**, construyendo la etapa `build` con `--target build` y
+  comparándola contra la imagen final, en vez de citar un número de memoria.
+- Las imágenes públicas **deslogueado del registry**, con las imágenes locales borradas y
+  el caché de construcción vacío. Que la página diga *Public* no prueba nada.
+- El repositorio clonado en una carpeta limpia y levantado siguiendo el propio README.

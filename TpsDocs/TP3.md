@@ -32,9 +32,9 @@ Lo único que se decide —y lo único que se defiende de verdad— son **tres c
 | 7 | Jerarquía navegable por **sub-issues** | ✅ |
 | 8 | Sprint con duración justificada | ✅ campo `Sprint`, iteraciones de 7 días |
 | 9 | Board con automatización mínima | ✅ vista *Tablero* · automatización verificada |
-| 10 | Límite de WIP configurado | ⬜ (web) |
+| 10 | Límite de WIP configurado | ✅ **2** en *In Progress* (vista Tablero) |
 | 11 | 1 PR mergeado que cierra su issue solo | ✅ PR #17 → cierra #14 |
-| 12 | `decisiones.md` con las 5 cosas | ✅ falta declaración de IA |
+| 12 | `decisiones.md` con las 5 cosas | ✅ con la declaración de IA |
 | 13 | Tag `v3.0.0` + release | ✅ |
 
 ---
@@ -130,7 +130,25 @@ Dos vistas sobre los mismos items: **Backlog** (tabla) y **Tablero** (board por 
 | **In Progress** | Sprint 1 | #13 CI: build y tests automáticos en cada PR |
 | **Done** | Sprint 1 | #14 Escribir el workflow (cerrada sola por el PR #17) |
 
-*In Progress* tiene exactamente **2** items: justo en el límite de WIP.
+### El límite de trabajo en progreso
+
+**Configurado en 2**, sobre la columna *In Progress* de la vista *Tablero*. Es la regla
+de arranque: personas + 1 → trabajando solo, 1 + 1 = 2.
+
+El "+1" no es un redondeo, es la **válvula**: cuando una tarjeta queda esperando algo que
+no depende de mí —una corrida de CI, una revisión— hace falta poder avanzar en otra cosa
+sin romper el acuerdo. Con límite 1 el trabajo se bloquea cada vez que algo espera; con 2
+hay exactamente una holgura.
+
+Hoy *In Progress* tiene exactamente 2 items (#12 y #13): **justo en el límite**.
+
+Se configura desde la web (*⋯ de la columna → Set limit*). Es lo único de este práctico
+que la API genuinamente no expone: el tipo `ProjectV2View` no ofrece ninguna
+configuración de límites por columna.
+
+> ⚠️ **La herramienta no bloquea.** GitHub pone el contador de la columna en rojo y deja
+> pasar igual. El límite es un **acuerdo**, no un candado — y esa distinción es parte de
+> lo que se pregunta en la mesa.
 
 ### El campo Sprint
 
@@ -281,4 +299,20 @@ está hecho?" se contesta preguntando en el pasillo.
 
 ## 6 · Uso de IA
 
-*(Va en `decisiones.md`. Completar.)*
+La declaración formal vive en `decisiones.md`, al cierre de la sección `## TP3` —
+**está completa**.
+
+En resumen: la IA creó las etiquetas, los cinco issues, la jerarquía de sub-issues y el
+campo Sprint contra la API de GitHub, y redactó el borrador de la sección. Las **tres
+cosas que este práctico deja explícitamente a criterio del alumno** —la duración del
+sprint, el límite de WIP y el diagnóstico de la historia mal escrita— son decisiones
+propias, igual que la de reportar un bug real de la aplicación en vez del genérico del
+video. La verificación consistió en navegar la cadena de trazabilidad completa en la
+interfaz y comprobar que la historia #13 siguiera **abierta** después de cerrarse su
+sub-issue.
+
+**Un error de la IA que se corrigió a tiempo:** afirmó que la API de GitHub no permitía
+crear campos de tipo Iteration y que había que hacerlo a mano. Era falso — el CLI de
+`gh` no lo soporta, pero la mutación `createProjectV2Field` sí acepta
+`dataType: ITERATION`. Quedó documentado como problema porque la lección es
+aprovechable: **el CLI es un envoltorio parcial, no el límite de la plataforma.**
