@@ -17,40 +17,58 @@ hasta el Integrador.
     elección de app en `elegir-app.md`.
 - Sample de referencia de la cátedra (estructura que asumen las guías, **no** se
   entrega): https://github.com/ingsoft3ucc/demo-fullstack
-- Bloque en curso: **P1 = TP1 (Git) · TP2 (Docker) · TP3 (Planificación) · TP4 (CI)**
+- Bloque en curso: **P2 = TP5 (Testing) · TP6 (CD) · TP7 (Contenedores + e2e) · TP8 (IaC) · TP9 (DevSecOps + observabilidad)**
+- P1 (TP1–TP4) cerrado: tags `v1.0.0`…`v4.0.0` en `main`, defendido el 2/9/2026.
 
-## Fechas — Grupo B
+## Fechas
+
+### P2 — comisión 2 (cursa los miércoles) — en curso
 
 | Hito | Fecha |
 |---|---|
-| Cierre del formulario de la cátedra | **lunes 31/8/2026 · 23:59** |
-| Defensa oral P1 | **miércoles 2/9/2026**, 16:00–19:30 |
-| Turno de Augusto | **puesto 35 · 19:24** (último tramo) |
-| Tiempo por persona | **6:00 exactos** |
+| Corte de la entrega de la comisión 2 | **lunes 26/10/2026 · 23:59** |
+| Defensa sorteada | **viernes 30/10/2026 · puesto 7 · 14:30** (10:00 por persona) |
+| Recuperatorio y ausentes | **viernes 13/11/2026 · desde las 13:30** (el orden se arma ese día) |
 
-Se corrige **lo que esté en `main` la mañana siguiente al cierre**, no lo que había
-cuando se cargó el formulario. El formulario se puede reabrir y corregir; se toma la
-última respuesta.
+- Se corrige el repo **tal como estaba en GitHub a la hora del corte** (cuenta la hora
+  en que GitHub recibió el push, no la fecha del commit): `main`, y cada TP en el
+  commit de su release. Lo que se sube después no cuenta.
+- **Si el formulario no está cargado al cierre, no se pre-corrige: nota técnica 0.**
+- El 13/11 es a la vez recuperatorio y fecha de los ausentes: esa defensa es la
+  única oportunidad. El recuperatorio alcanza para **un solo bloque**.
 
+Formulario P2: https://docs.google.com/forms/d/e/1FAIpQLSe0KrP6Ccw9EntLmzChzh8B7Py8GgmiYXDa-VbuyOoxkJeDWg/viewform
+
+Se carga: legajo, apellido y nombre, riel (GitHub), URL del repo, nombre de la app,
+**URLs de QA y PROD**, y "algo que deba saber" (si se usó el fallback local del
+TP6/TP7: escribir **FALLBACK LOCAL** y avisar antes).
+
+### P1 — grupo B — cerrado
+
+Corte 31/8/2026 · defensa miércoles 2/9/2026, puesto 35, 19:24, 6:00 por persona.
 Formulario P1: https://docs.google.com/forms/d/e/1FAIpQLSfDN9ytzgGD9RzPu9TDSG1REWhDY-uqlQroKnMWzcJGFArkpQ/viewform
-
-Se cargan **dos URLs**: la del repo público y la del Project (TP3). Campo
-"compañero": **SIN COMPAÑERO**.
+(se cargaron el repo y el Project; "compañero": SIN COMPAÑERO).
 
 ## Cómo se evalúa
 
-P1 = **25% configuración técnica + 25% `decisiones.md` + 50% defensa oral**.
+Cada presentación da **una nota**; las dos van por separado (no se promedian ni se
+compensan). Se aprueba con **60% (un 4)**. Para regularizar hacen falta las dos.
 
-Peso relativo de cada TP dentro de P1 (tabla del reglamento §5):
+**P2** = **50% los cinco TPs, corregidos antes sobre el repo** + **50% defensa oral**
+(2 o 3 preguntas sobre cualquiera de los TPs 5–9 y sobre `decisiones.md`, con
+repreguntas; 10 minutos; el día de la defensa se pone sólo esa mitad). Cada pregunta
+mira tres cosas: el concepto, el porqué y el cómo.
 
-| TP | Peso | Tema |
+| TP | Peso en P2 | Tema |
 |---|---|---|
-| TP1 | 5% | Git colaborativo |
-| TP2 | 40% | Contenedores |
-| TP3 | 10% | Planificación y trazabilidad |
-| TP4 | 45% | CI / Pipelines as Code |
+| TP5 | 25% | Testing: unit tests, coverage y el umbral que frena un merge |
+| TP6 | 25% | CD: environments, aprobaciones y deployment patterns |
+| TP7 | 20% | Contenedores en el pipeline + integración y e2e |
+| TP8 | 15% | Infraestructura como código |
+| TP9 | 15% | DevSecOps + observabilidad |
 
-TP2 + TP4 = 85% del peso. Ese es el orden de prioridad ante cualquier recorte.
+P1 (cerrado) era 25% configuración técnica + 25% `decisiones.md` + 50% defensa, con
+pesos TP1 5% · TP2 40% · TP3 10% · TP4 45%.
 
 Regla innegociable: **«si no lo podés explicar, no lo aprobás — aunque funcione»**.
 Su reversa, textual del reglamento: *un repo con cicatrices bien explicadas vale más
@@ -138,10 +156,15 @@ El reglamento §3 y §5 lo piden explícitamente, y **no** estaba en las filmina
 | TP2 | `v2.0.0` | sí, con notas |
 | TP3 | `v3.0.0` | sí, con notas |
 | TP4 | `v4.0.0` | sí, con notas |
+| TP5 | `v5.0.0` | sí, con notas |
+| TP6 | `v6.0.0` | sí — sobre el commit que está **en PROD** según *Deployments* |
+| TP7 | `v7.0.0` | sí — sobre el commit que está **en PROD** (`--verify-tag`) |
+| TP8 | `v8.0.0` | sí — sobre el commit que deja `infra/` terminado |
+| TP9 | `v9.0.0` | sí, con notas |
 
 > «Antes de entregar, verificá que estén los tags de los TPs que cubre la
-> presentación (`v1.0.0`…`v4.0.0` para P1): son el punto exacto que se mira de cada
-> TP.»
+> presentación (`v1.0.0`…`v4.0.0` para P1, `v5.0.0`…`v9.0.0` para P2): son el punto
+> exacto que se mira de cada TP.»
 
 Mecánica: `git tag -a vN.0.0 -m "TPN cerrado" && git push origin vN.0.0`, y la
 release desde la web (*Releases → Draft a new release*). Si después se corrige un TP
@@ -171,6 +194,33 @@ Qué pide cada sección (textual de los enunciados):
 - **TP4** — por qué esos jobs y por qué en paralelo · qué cachea y qué pasa si el
   cache desaparece · por qué construye con tu Dockerfile en vez de compilar por su
   cuenta · problemas · IA.
+- **TP5** — qué lógica se testeó y por qué esa · el umbral: número, **métrica** (línea,
+  rama o las dos) y por qué, más el número de **rama** de hoy · **qué quedó afuera de la
+  cuenta**, back y front, y por qué cada cosa · por qué coverage alto no es calidad (con
+  un ejemplo propio) · el PR bloqueado: qué check, en qué métrica, qué se escribió para
+  arreglarlo · el refactor para poder mockear · qué herramienta cubrió cada fila de «Tu
+  stack, de un vistazo» (el stack no es el de la cátedra) · **el ejercicio del camino
+  sin cubrir**: qué línea, qué entrada la recorre, qué se decidió (obligatorio) ·
+  problemas · IA. Cada decisión con la **URL** que la prueba (la corrida, el PR).
+- **TP6** — arriba de todo, **«Enlaces de este TP»**: los dos paquetes, las dos corridas
+  de la cadena (PR con «Entrar al registry» salteado + lista de pasos de una corrida de
+  `main`) y las URLs de QA y PROD · por qué se publica sólo en verde · Delivery vs
+  Deployment · la cadena `needs`/`if`/environments y el alcance de cada secret · qué
+  mira el aprobador · la letra chica del free tier · qué se pierde porque Render
+  reconstruye · qué prueba el smoke y qué no · patrón de deploy + rollback
+  **cronometrado** · qué quedó por variable y qué adentro de la imagen del front ·
+  problemas · IA.
+- **TP7** — arriba, **«Enlaces del TP7»**: paquetes con sus `sha-…`, la corrida con
+  integración verde y e2e roja (commit que rompió, corrida, los dos reportes), la corrida
+  verde hasta PROD, URLs de QA y PROD · build once, deploy many · etiquetas (`sha-` vs
+  `v7.0.0`, por qué no `latest`) · del tag a la imagen en un paso · cómo se comprueba
+  que el entorno ejecuta la imagen · qué va en integración y qué en e2e, y el par
+  verde/rojo · integración amplia vs estrecha · cold start y flaky · la misma imagen del
+  front en QA y PROD · problemas · IA.
+- **TP8** — tres renglones: qué riel y qué versión de cada provider · problemas · IA.
+- **TP9** — tres renglones: qué actualizaba el PR de Dependabot y por qué se mergeó ·
+  cuánto tardó el monitor en avisar, la operación más usada y la más lenta · problemas
+  · IA.
 
 ### `evidencias.md`
 
@@ -179,7 +229,10 @@ Qué pide cada sección (textual de los enunciados):
   irrepetibles**: hay que capturarlos cuando pasan.
 - **TP2 sí lleva**: `compose up` end-to-end · persistencia (`down/up` vs `down -v`) ·
   tamaño imagen final vs imagen de SDK · imágenes públicas en el registry.
-- **TP3 y TP4 no llevan**: el Project y el repo son públicos, se ven solos.
+- **TP3 a TP9 no llevan**: el Project y el repo son públicos, se ven solos. Desde P2,
+  todo lo que tiene dirección propia (una corrida, un PR, un paquete, una URL de
+  entorno) se entrega como **URL** adentro de `decisiones.md`, pegada a la decisión que
+  prueba.
 
 ### Errores que el profesor ya marcó — evitarlos de entrada
 
@@ -195,7 +248,7 @@ Qué pide cada sección (textual de los enunciados):
   **quien recibe valor**, no quien programa.
 - El historial dice cuándo se trabajó, y se pregunta en la defensa.
 
-## Orden de trabajo — hay una dependencia que obliga
+## Orden de trabajo de P1 — hay una dependencia que obliga
 
 **TP1 → TP2 → TP3 → TP4.** No es solo prioridad: el TP3 y el TP4 están encadenados.
 
@@ -209,7 +262,7 @@ pipeline real. Hacer el TP4 antes del TP3 obliga a inventar el orden al revés.
 > `ci.yml` esqueleto del TP3 — corre el workflow viejo, da verde sobre código que no
 > compila, y no se entiende por qué.
 
-## Qué tiene que existir al cierre
+## P1 — qué tenía que existir al cierre (cerrado, se conserva como referencia)
 
 ### TP1 — Git
 
@@ -338,11 +391,139 @@ tiene beneficio verificable.
   no cambia nada: hay que romper una **dependencia** (un paquete inexistente en
   `package.json` → falla el `npm ci` del Dockerfile).
 
+## P2 — orden de trabajo y qué tiene que existir al cierre
+
+**TP5 → TP6 → TP7 → TP8 → TP9**, y no es sólo la numeración:
+
+- El TP6 publica las imágenes **sólo si pasaron los tests del TP5**, y sólo desde `main`.
+- El TP7 hace que los entornos del TP6 **ejecuten esas imágenes** en vez de reconstruir,
+  y corre integración + e2e contra el QA del TP6 antes de promover a PROD.
+- El TP8 crea `preprod` corriendo **la imagen del TP7**, sin tocar QA ni PROD.
+- El TP9 vigila la **PROD del TP6** (monitor externo + Sentry).
+
+Cada guía se lee **entera** en `trabajos/` antes de implementar su TP: las trampas
+están en la letra chica, no en las tareas.
+
+### Al cierre, en `main`
+
+- Releases `v5.0.0`…`v9.0.0` (ver la tabla de tags: la `v6` y la `v7` van sobre el
+  commit que está en PROD).
+- `decisiones.md` con `## TP5`…`## TP9` (TP6 y TP7 con su sección de enlaces arriba).
+- **QA y PROD vivos** hasta la defensa: en la mesa se navegan.
+- El **segundo PR del TP5, abierto y en rojo** hasta la defensa.
+- `infra/` lista para correr un `plan` o un `apply` en vivo (credenciales cargadas en
+  la terminal, sin mostrarlas). Preprod no tiene que estar vivo: tiene que poder nacer.
+- Lo de Sentry y el monitor **vence a los 30 días**: si es más viejo, se repite antes
+  de la fecha (y el monitor se vuelve a pausar).
+
+### TP5 — Testing
+
+- [ ] Backend: **≥8 métodos de test** AAA sobre **≥4 reglas distintas**, con ≥1
+      parametrizado (`it.each`), ≥1 caso de error y **≥1 test con mock** (cuenta dentro
+      de los 8). Cuentan los MÉTODOS, no los datos de un `it.each`.
+- [ ] Frontend: **≥4 unit tests sin DOM**, con las mismas tres técnicas (parametrizado,
+      caso de error, mock).
+- [ ] Un test vale si, al invertir la regla o correr un borde (`>` → `>=`), algún test
+      se pone rojo.
+- [ ] Coverage de back y front **en el pipeline**: resumen en el *Summary* de la
+      corrida y reporte descargable como artefacto, de los dos lados. Siempre se
+      reporta **rama**.
+- [ ] Umbral elegido y justificado, en **líneas y ramas**, que **rompe el build** de los
+      dos lados. Los tests corren adentro de `build-backend` y `build-frontend`, que ya
+      son required checks: no se agrega ningún check nuevo.
+- [ ] **Dos PRs**: el primero, código nuevo sin tests → rojo **por cobertura** con todo
+      compilando y en verde → los tests que faltaban → verde → **mergeado**. El segundo,
+      chico, desde `main` después de ese merge, con el mismo problema, **abierto y en
+      rojo hasta la defensa**.
+- [ ] Cierra la tarea #15 del Project (*Publicar el reporte de tests como artefacto*)
+      con `Closes #15`; con eso la historia #13 cumple sus cuatro criterios.
+- [ ] Sección `## TP5` + tag `v5.0.0` + release.
+
+### TP6 — CD
+
+- [ ] Imágenes en ghcr etiquetadas con el commit (`sha-…`), publicadas **sólo en `push`
+      a `main` y después de los tests**; paquetes públicos (`docker pull` sin
+      credenciales).
+- [ ] QA y PROD en Render + Neon (front + back + **base separada por entorno**), con el
+      deploy **disparado por el pipeline** (deploy hooks; Auto-Deploy en Off en los
+      cuatro servicios).
+- [ ] La dirección del backend **no va adentro de la imagen del front**: se lee del
+      entorno al arrancar (plantilla de nginx). La misma imagen sirve en QA y en PROD.
+- [ ] Environments `qa` y `production` en GitHub, con los secrets de deploy en su
+      alcance.
+- [ ] Push a `main` → CI verde → deploy a QA → **smoke con reintentos** que falla el job.
+- [ ] `production` con **required reviewer** (Augusto, *Prevent self-review* apagado):
+      un flujo aprobado completo y **un rechazo con motivo propio y específico**.
+- [ ] Rollback hecho **de verdad** y cronometrado (inicio y *live* en *Deploys* de Render).
+- [ ] Sección `## TP6` (con «Enlaces de este TP» arriba) + `v6.0.0`.
+
+### TP7 — Contenedores + e2e
+
+- [ ] Los cuatro servicios de Render **ejecutan la imagen del registry**
+      (`imgURL=…:sha-<commit>` por deploy hook); en *Events* se lee «Triggered via Deploy
+      Hook» con ese `sha`.
+- [ ] Integración: **≥3 pruebas** en `frontend/e2e/api.spec.js` (Playwright `request`,
+      sin navegador) contra la api de QA: alta + verificación + borrado · alta inválida
+      → 400 y no se creó nada · una tercera propia. Nombres únicos con la hora; limpian
+      lo que crean.
+- [ ] e2e: **≥3 flujos** con navegador contra QA (uno de creación, uno de
+      error/validación, y el que el usuario hace todos los días). Sin mocks de red, sin
+      `skip`; el cold start se resuelve con timeouts.
+- [ ] Cadena `deploy-qa → integracion → e2e → deploy-prod`, sin nada que desarme el gate
+      (`continue-on-error`, `|| true`, `if: always()`).
+- [ ] Una corrida con **integración verde y e2e roja** por un commit que rompe **la
+      aplicación** (no el test) → fix → verde → aprobación → PROD con **la misma imagen**.
+- [ ] Sección `## TP7` (con «Enlaces del TP7») + `v7.0.0`.
+
+### TP8 — IaC
+
+- [ ] `infra/` con Terraform (Neon + Render) que crea **`preprod`** corriendo la imagen
+      del TP7; providers **fijados por versión**; ninguna credencial en el HCL; cadena de
+      conexión y dirección del backend **derivadas**, no copiadas.
+- [ ] `.gitignore` de estado, `.terraform/` y tfvars **antes del primer apply**;
+      `infra/` a `main` por PR, con `.terraform.lock.hcl` y **sin el estado**.
+- [ ] `destroy` → `apply` vuelve **idéntico**, con QA y PROD intactos.
+- [ ] Sección corta `## TP8` + `v8.0.0`.
+
+### TP9 — DevSecOps + observabilidad
+
+- [ ] Dependabot (npm del back, npm del front, github-actions) + alertas y security
+      updates prendidos; **≥1 PR de Dependabot mergeado** con el pipeline en verde.
+- [ ] CodeQL (configuración por defecto) con su primer análisis visible.
+- [ ] Push protection verificada activa.
+- [ ] Monitor externo sobre `/health` de PROD, con **una caída provocada** (aviso de
+      DOWN y de UP) y el monitor **pausado** al terminar.
+- [ ] Sentry en back y front de PROD (por PR), con ≥1 error y la tabla de uso real.
+- [ ] Una **tarjeta en el tablero del TP3** nacida de un dato visto (la operación más
+      lenta, un error, lo que nadie usa).
+- [ ] Sección corta `## TP9` + `v9.0.0`.
+
+### Trampas de P2 que ya se conocen
+
+- **El stack no es el de la cátedra** (.NET): el backend es Node, así que los dos lados
+  usan vitest + `@vitest/coverage-v8` (la **misma versión exacta** que `vitest`). La
+  tabla «Tu stack, de un vistazo» del TP5 es el índice, y lo que se usó en cada fila se
+  cuenta en `decisiones.md`.
+- **La etapa de tests nace de `build` y necesita las devDependencies**: el
+  `npm prune --omit=dev` no puede quedar en `build`; pasa a una etapa propia.
+- La etapa de tests va **en el medio** del Dockerfile: si queda última, la imagen de
+  producción pasa a ser la de tests sin que nada se ponga rojo.
+- `load: true` en el build de la etapa de tests (si no, *Unable to find image*), y un
+  `scope` de cache distinto por cada build (pasan a ser cuatro).
+- Qué entra en la cuenta: el umbral se calcula sólo sobre la lógica. Excluir el
+  arranque **sólo después** de sacarle las reglas; si no, el número mide una sola
+  clase y da altísimo.
+- Los `thresholds` de vitest sólo se evalúan si la corrida pide `--coverage`. Si el
+  `include` no matchea nada, mide cero archivos y pasa en verde, en silencio.
+- (TP7) El `include` por defecto de vitest **también agarra `*.spec.js`**: cuando
+  aparezcan los specs de Playwright en `frontend/e2e/`, hay que sacar `e2e/**` de vitest.
+- (TP6) Render free: duerme a los 15 minutos, tarda ~1 minuto en despertar, **750 h
+  por mes por workspace**; su Postgres expira a los 30 días (por eso la base va en Neon).
+
 ## Bitácora en `TpsDocs/` — obligatoria
 
 Además de los entregables, se mantiene **un documento por TP** en `TpsDocs/`
-(`TP1.md`, `TP2.md`, `TP3.md`, `TP4.md`), actualizado **a medida que se avanza**, no
-al final. Cada uno lleva:
+(`TP1.md` … `TP9.md`), actualizado **a medida que se avanza**, no al final. Cada uno lleva:
 
 - El checklist del enunciado con su estado
 - El paso a paso ejecutado, con los **comandos reales y su salida real**
