@@ -1,15 +1,19 @@
 import express from 'express';
 import { pool, inicializarSchema, esperarBase } from './db.js';
+import { ReglaViolada, NoEncontrado } from './reglas.js';
 import {
-  ReglaViolada,
-  validarDni,
-  validarNombre,
-  validarFechaFutura,
-  validarTransicion,
-  haySolapamiento,
-  superaCupoDiario,
-} from './reglas.js';
+  crearProfesional,
+  eliminarProfesional,
+  crearPaciente,
+  crearTurno,
+  cambiarEstadoTurno,
+} from './servicios.js';
 
+/**
+ * Aca quedan solo las rutas y el arranque: cada handler pide, delega y responde.
+ * Las reglas viven en reglas.js (puras) y en servicios.js (las que tocan la base, que
+ * la reciben por parametro): por eso este archivo no entra en la cuenta de cobertura.
+ */
 const app = express();
 app.use(express.json());
 
@@ -33,28 +37,14 @@ app.get(
 app.post(
   '/api/profesionales',
   ruta(async (req, res) => {
-    const nombre = validarNombre(req.body.nombre);
-    const especialidad = validarNombre(req.body.especialidad);
-    const { rows } = await pool.query(
-      'INSERT INTO profesionales (nombre, especialidad) VALUES ($1, $2) RETURNING *',
-      [nombre, especialidad]
-    );
-    res.status(201).json(rows[0]);
+    res.status(201).json(await crearProfesional(pool, req.body));
   })
 );
 
 app.delete(
   '/api/profesionales/:id',
   ruta(async (req, res) => {
-    // Regla: no se borra un profesional que todavia tiene turnos pendientes.
-    const { rows: pendientes } = await pool.query(
-      "SELECT 1 FROM turnos WHERE profesional_id = $1 AND estado = 'PENDIENTE' LIMIT 1",
-      [req.params.id]
-    );
-    if (pendientes.length > 0) {
-      throw new ReglaViolada('No se puede eliminar un profesional con turnos pendientes');
-    }
-    await pool.query('DELETE FROM profesionales WHERE id = $1', [req.params.id]);
+    await eliminarProfesional(pool, req.params.id);
     res.status(204).end();
   })
 );
@@ -71,19 +61,7 @@ app.get(
 app.post(
   '/api/pacientes',
   ruta(async (req, res) => {
-    const nombre = validarNombre(req.body.nombre);
-    const dni = validarDni(req.body.dni);
-
-    const { rows: existe } = await pool.query('SELECT 1 FROM pacientes WHERE dni = $1', [dni]);
-    if (existe.length > 0) {
-      throw new ReglaViolada(`Ya existe un paciente con el DNI ${dni}`);
-    }
-
-    const { rows } = await pool.query(
-      'INSERT INTO pacientes (nombre, dni) VALUES ($1, $2) RETURNING *',
-      [nombre, dni]
-    );
-    res.status(201).json(rows[0]);
+    res.status(201).json(await crearPaciente(pool, req.body));
   })
 );
 
@@ -107,44 +85,14 @@ app.get(
 app.post(
   '/api/turnos',
   ruta(async (req, res) => {
-    const { pacienteId, profesionalId } = req.body;
-    const fecha = validarFechaFutura(req.body.fechaHora);
-
-    const { rows: turnosDelProfesional } = await pool.query(
-      'SELECT fecha_hora, estado FROM turnos WHERE profesional_id = $1',
-      [profesionalId]
-    );
-
-    if (haySolapamiento(fecha, turnosDelProfesional)) {
-      throw new ReglaViolada('El profesional ya tiene un turno que se superpone con ese horario');
-    }
-    if (superaCupoDiario(fecha, turnosDelProfesional)) {
-      throw new ReglaViolada('El profesional alcanzo el cupo de turnos para ese dia');
-    }
-
-    const { rows } = await pool.query(
-      `INSERT INTO turnos (paciente_id, profesional_id, fecha_hora)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [pacienteId, profesionalId, fecha.toISOString()]
-    );
-    res.status(201).json(rows[0]);
+    res.status(201).json(await crearTurno(pool, req.body));
   })
 );
 
 app.patch(
   '/api/turnos/:id/estado',
   ruta(async (req, res) => {
-    const { rows: actual } = await pool.query('SELECT estado FROM turnos WHERE id = $1', [
-      req.params.id,
-    ]);
-    if (actual.length === 0) return res.status(404).json({ error: 'Turno no encontrado' });
-
-    const nuevo = validarTransicion(actual[0].estado, req.body.estado);
-    const { rows } = await pool.query(
-      'UPDATE turnos SET estado = $1 WHERE id = $2 RETURNING *',
-      [nuevo, req.params.id]
-    );
-    res.json(rows[0]);
+    res.json(await cambiarEstadoTurno(pool, req.params.id, req.body.estado));
   })
 );
 
@@ -152,6 +100,9 @@ app.patch(
 app.use((err, _req, res, _next) => {
   if (err instanceof ReglaViolada) {
     return res.status(400).json({ error: err.message });
+  }
+  if (err instanceof NoEncontrado) {
+    return res.status(404).json({ error: err.message });
   }
   console.error(err);
   res.status(500).json({ error: 'Error interno del servidor' });

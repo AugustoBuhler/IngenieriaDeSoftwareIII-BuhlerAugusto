@@ -19,6 +19,14 @@ export class ReglaViolada extends Error {
   }
 }
 
+/** Lo que se pidio no existe: lo distingue de una regla violada para poder devolver 404. */
+export class NoEncontrado extends Error {
+  constructor(mensaje) {
+    super(mensaje);
+    this.name = 'NoEncontrado';
+  }
+}
+
 /** Regla 1 — el DNI es obligatorio y tiene que ser numerico de 7 u 8 digitos. */
 export function validarDni(dni) {
   if (!/^\d{7,8}$/.test(String(dni ?? '').trim())) {
