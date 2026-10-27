@@ -38,6 +38,50 @@ jobs:
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
+      # ---- TP5: los tests corren ADENTRO del contenedor, en la etapa `test` del
+      # Dockerfile. El pipeline sigue sin saber como se testea la app: se lo pide al
+      # Dockerfile, igual que la compilacion. Una receta, no dos.
+      - name: Construir la etapa de tests
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          target: test              # se detiene en la etapa de tests, no llega a final
+          load: true                # la deja en el Docker de la maquina para poder correrla
+          push: false               # la imagen de tests no va a ningun registry
+          tags: backend-test:ci
+          # otro estante: son cuatro builds (test y final, de back y de front)
+          cache-from: type=gha,scope=backend-test
+          cache-to: type=gha,mode=max,scope=backend-test
+
+      # Si un test falla o la cobertura no llega al umbral, vitest sale con error, el
+      # docker run devuelve ese codigo y el job queda en rojo: el required check del
+      # TP4 bloquea el merge sin configurar nada nuevo.
+      - name: Correr los tests con coverage
+        run: |
+          docker run --rm -e COVERAGE_DIR=/salida/reporte \
+            -v "${{ github.workspace }}/backend-coverage:/salida" backend-test:ci
+
+      - name: Resumen del coverage del backend
+        if: ${{ !cancelled() }}    # tambien con los tests en rojo: es cuando mas se mira
+        run: |
+          F=backend-coverage/reporte/coverage-summary.json
+          test -f "$F"             # si no esta, el paso falla: mejor rojo que un resumen vacio
+          node -e "
+            const t = require('./$F').total;
+            if (!t.lines.total) { console.error('midio 0 archivos: revisa el include'); process.exit(1); }
+            const f = (m) => \`| \${m} | \${t[m].covered} de \${t[m].total} | \${t[m].pct}% |\`;
+            console.log('### Coverage del backend');
+            console.log('| metrica | cubierto | % |'); console.log('|---|---|---|');
+            console.log(f('lines')); console.log(f('branches')); console.log(f('functions'));
+          " >> $GITHUB_STEP_SUMMARY
+
+      - name: Publicar el reporte de coverage del backend
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-backend
+          path: backend-coverage
+
   build-frontend:
     runs-on: ubuntu-latest
     steps:
