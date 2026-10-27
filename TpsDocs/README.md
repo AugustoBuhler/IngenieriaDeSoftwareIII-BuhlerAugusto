@@ -3,14 +3,16 @@
 Documentación completa de cada TP: qué pide el enunciado, qué se hizo, con qué
 comandos, qué salió mal y qué hay que poder explicar en la defensa.
 
-| Documento | TP | Peso en P1 | Estado |
+| Documento | TP | Peso | Estado |
 |---|---|---|---|
-| [TP1.md](TP1.md) | Git colaborativo | 5% | **cerrado** · `v1.0.0` |
-| [TP2.md](TP2.md) | Contenedores | 40% | **cerrado** · `v2.0.0` |
-| [TP3.md](TP3.md) | Planificación y trazabilidad | 10% | **cerrado** · `v3.0.0` |
-| [TP4.md](TP4.md) | CI · Pipelines as Code | 45% | **cerrado** · `v4.0.0` |
+| [TP1.md](TP1.md) | Git colaborativo | 5% de P1 | **cerrado** · `v1.0.0` |
+| [TP2.md](TP2.md) | Contenedores | 40% de P1 | **cerrado** · `v2.0.0` |
+| [TP3.md](TP3.md) | Planificación y trazabilidad | 10% de P1 | **cerrado** · `v3.0.0` |
+| [TP4.md](TP4.md) | CI · Pipelines as Code | 45% de P1 | **cerrado** · `v4.0.0` |
+| [TP5.md](TP5.md) | Testing · coverage y el umbral que frena un merge | 25% de P2 | en curso |
 
-Los cuatro prácticos del bloque **P1** están cerrados, con su tag y su release.
+Los cuatro prácticos del bloque **P1** están cerrados, con su tag y su release. El
+bloque **P2** (TPs 5 a 9) está en curso.
 
 ## Qué es esto y qué NO es
 
